@@ -197,3 +197,6 @@ def verify_answers(req: VerifyAnswersRequest):
 @app.get("/api/leaderboard")
 def leaderboard():
     return db.get_leaderboard()
+
+from fastapi.staticfiles import StaticFiles
+app.mount("/app", StaticFiles(directory="frontend", html=True), name="frontend")
