@@ -119,8 +119,8 @@
     </main>
 
     <script>
-        // Базовый URL вашего локального сервера FastAPI
-        const API_URL = "http://127.0.0.1:8000";
+        // Используем window.location.origin, чтобы работало на любом ноутбуке без ошибок CORS/HTTPS
+        const API_URL = window.location.origin.includes("8000") ? window.location.origin : "http://127.0.0.1:8000";
 
         // Функция для автозаполнения демо-текста (чтобы не печатать вручную на видео)
         function fillDemoPain() {
@@ -185,14 +185,17 @@
                 emptyBox.classList.add("hidden");
 
                 list.forEach((item, idx) => {
-                    const score = item.score ?? item.final_score ?? 0;
-                    const astValid = item.ast_valid !== false;
+                    // Читаем балл из любого возможного поля БД (включая ai_compliance_score!)
+                    const score = item.ai_compliance_score ?? item.score ?? item.final_score ?? 0;
+                    const astValid = item.ast_valid !== false && item.ast_valid !== 0;
 
-                    // Определяем цвет бейджа в зависимости от балла
-                    let badgeHtml = `<span class="px-2.5 py-1 rounded-full text-xs font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">✓ Подтвержден</span>`;
-                    if (score < 50) {
-                        badgeHtml = `<span class="px-2.5 py-1 rounded-full text-xs font-mono bg-rose-500/10 text-rose-400 border border-rose-500/20">✕ Подозрение на AI-чит</span>`;
-                    } else if (score < 75) {
+                    // Определяем цвет бейджа и статус в зависимости от балла и вердикта из БД
+                    let badgeHtml = `<span class="px-2.5 py-1 rounded-full text-xs font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">✓ Подтвержден (${score}%)</span>`;
+                    if (score === 0 && (!item.verdict || item.verdict === "Ожидает защиты")) {
+                        badgeHtml = `<span class="px-2.5 py-1 rounded-full text-xs font-mono bg-slate-800 text-slate-400 border border-slate-700">⏳ Ожидает блиц</span>`;
+                    } else if (score < 50) {
+                        badgeHtml = `<span class="px-2.5 py-1 rounded-full text-xs font-mono bg-rose-500/10 text-rose-400 border border-rose-500/20">🚨 AI-Чит / Не сдал</span>`;
+                    } else if (score < 80) {
                         badgeHtml = `<span class="px-2.5 py-1 rounded-full text-xs font-mono bg-amber-500/10 text-amber-400 border border-amber-500/20">~ Требует ревью</span>`;
                     }
 
