@@ -2,6 +2,8 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List
+import os
+from fastapi.staticfiles import StaticFiles
 import database as db  # Импортируем наш файл database.py, чтобы вызывать функции БД
 
 # Пытаемся подключить файлы Участника 2 (AST-парсер и ИИ-сервис).
@@ -38,17 +40,20 @@ def startup():
 # Если фронтенд пришлет неправильные типы данных, Pydantic автоматически вернет понятную ошибку 422.
 
 class GenerateTaskRequest(BaseModel):
-    business_pain: str  # Ожидаем строку с описанием боли бизнеса
+    business_pain: str        # Ожидаем строку с описанием боли бизнеса
 
 class SubmitCodeRequest(BaseModel):
-    task_id: int        # ID задачи, которую решает студент
-    candidate_name: str # Имя студента
-    code: str           # Присланный Python-код
+    task_id: int              # ID задачи, которую решает студент
+    candidate_name: str       # Имя студента
+    code: str                 # Присланный Python-код
 
 class VerifyAnswersRequest(BaseModel):
-    submission_id: int  # ID попытки (который мы выдали при отправке кода)
-    answers: List[str]  # Список из 3 ответов студента на блиц-вопросы
-    time_spent_sec: int = 45  # Сколько секунд потратил (по умолчанию 45)
+    submission_id: int        # ID попытки (который мы выдали при отправке кода)
+    answers: List[str]        # Список из 3 ответов студента на блиц-вопросы
+    time_spent_sec: int = 45  # Сколько секунд потратил
+    tab_switches: int = 0     # Сколько раз кандидат уходил со вкладки в ChatGPT
+    paste_attempts: int = 0   # Сколько раз пытался вставить текст через Ctrl+V
+    keystrokes: int = 100     # Сколько реально клавиш нажал на клавиатуре
 
 
 # --- МАРШРУТЫ (ЭНДПОИНТЫ API) ---
@@ -157,39 +162,137 @@ def submit_code(req: SubmitCodeRequest):
     }
 
 
-# 3. Эндпоинт проверки блиц-защиты: принимает 3 ответа кандидата и выдает финальный AI-Compliance Score
+# 3. Эндпоинт проверки блиц-защиты + 4-уровневый Анти-Чит Детектор ИИ
 @app.post("/api/verify-answers")
 def verify_answers(req: VerifyAnswersRequest):
-    if not USE_MOCKS and hasattr(ai_service, "evaluate_answers"):
-        eval_res = ai_service.evaluate_answers(req.submission_id, req.answers, req.time_spent_sec)
-        score = eval_res["ai_compliance_score"]
-        verdict = eval_res["verdict"]
-        breakdown = eval_res.get("breakdown", {"code_quality": 95, "blitz_defense": score, "authenticity": "High"})
+    # Очищаем ответы от пробелов и берем только осмысленные (длиннее 5 символов)
+    clean_answers = [a.strip() for a in (req.answers or []) if a and len(a.strip()) > 5]
+    answered_count = len(clean_answers)
+    time_spent = req.time_spent_sec if req.time_spent_sec is not None else 0
+
+    # --- УРОВЕНЬ 1: ПРОВЕРКА НА ПУСТЫЕ ОТВЕТЫ ---
+    if answered_count == 0:
+        score = 0
+        verdict = "Не пройдено: Кандидат отправил пустые ответы и не смог защитить свой код."
+        authenticity = "None"
+        ai_probability = 0
+
+    # --- УРОВЕНЬ 2: ПОВЕДЕНЧЕСКИЙ ПРОКТОРИНГ (Переключение вкладок в ChatGPT / Попытки Ctrl+V) ---
+    elif req.paste_attempts > 0 or req.tab_switches > 1:
+        score = 10
+        ai_probability = 95
+        verdict = (
+            f"🚨 AI-Детектор: Зафиксировано читерство! "
+            f"Уходов со вкладки (в сторонний ИИ): {req.tab_switches}, "
+            f"попыток вставки (Ctrl+V): {req.paste_attempts}."
+        )
+        authenticity = "Fake (Proctoring Alert)"
+
+    # --- УРОВЕНЬ 3: КОНТРОЛЬ АНОМАЛЬНОГО ВРЕМЕНИ (< 20 сек или > 95 сек) ---
+    elif time_spent < 20:
+        score = 15
+        ai_probability = 90
+        verdict = f"🚨 Подозрение на ИИ (Анти-чит): Ответы отправлены слишком быстро ({time_spent} сек < 20 сек). Человек не успеет прочитать и напечатать."
+        authenticity = "Low (Speed Anomaly)"
+
+    elif time_spent > 95:
+        score = 35
+        ai_probability = 60
+        verdict = f"Время вышло ({time_spent} сек): Кандидат слишком долго искал ответы в сторонних источниках."
+        authenticity = "Low (Timeout)"
+
+    # --- УРОВЕНЬ 4: ЛИНГВИСТИЧЕСКИЙ AI-ДЕТЕКТОР + ОЦЕНКА КАЧЕСТВА ОТВЕТОВ ---
     else:
-        # Заглушка: если студент написал осмысленные ответы (длиннее 5 символов), ставим высокий балл
-        filled_answers = [a for a in req.answers if len(a.strip()) > 5]
-        if len(filled_answers) >= 2:
-            score = 92
-            verdict = "Код написан самостоятельно. Кандидат понимает алгоритмическую сложность."
-            authenticity = "High"
+        total_points = 0
+        # Ключевые технические слова для проверки понимания кода
+        tech_words = [
+            "словар", "dict", "спис", "list", "цикл", "for", "while", "сложност",
+            "o(", "none", "пуст", "ошибк", "ключ", "значен", "память", "время",
+            "услов", "if", "return", "проверк", "элемент", "функц", "индекс", "алгоритм"
+        ]
+        # Типичные канцеляризмы и шаблоны генерации ChatGPT / LLM
+        ai_cliches = [
+            "таким образом", "следовательно", "резюмируя", "в заключение",
+            "данный алгоритм", "во-первых", "во-вторых", "безусловно", "в контексте данной"
+        ]
+
+        ai_markers_found = 0
+        total_chars = sum(len(a) for a in clean_answers)
+
+        for ans in clean_answers:
+            words_count = len(ans.split())
+            ans_lower = ans.lower()
+
+            # Проверяем текст на шаблонные фразы ИИ
+            for cliche in ai_cliches:
+                if cliche in ans_lower:
+                    ai_markers_found += 1
+
+            # Базовые баллы за полноту ответа
+            if words_count < 4:
+                q_points = 8    # Слишком короткая отписка
+            elif words_count < 8:
+                q_points = 15   # Средний ответ
+            else:
+                q_points = 22   # Развернутый ответ
+
+            # Бонус за технические термины (до +8 баллов за вопрос)
+            matched_terms = sum(1 for w in tech_words if w in ans_lower)
+            q_points += min(8, matched_terms * 4)
+            total_points += min(30, q_points)
+
+        speed_bonus = 10 if (20 <= time_spent <= 55 and answered_count == 3) else 4
+        raw_score = min(100, total_points + speed_bonus)
+
+        # Штрафуем, если нажатий клавиш подозрительно мало по сравнению с длиной текста
+        penalty = (req.tab_switches * 25) + (ai_markers_found * 20)
+        if req.keystrokes < total_chars * 0.4:
+            penalty += 35
+
+        score = max(15, raw_score - penalty)
+        ai_probability = min(98, (req.tab_switches * 35) + (ai_markers_found * 30) + (5 if score >= 80 else 20))
+
+        # Итоговый вердикт с метриками анти-чита
+        if score >= 80:
+            verdict = (
+                f"✓ Код написан самостоятельно ({answered_count}/3 ответов за {time_spent} сек). "
+                f"Ручной ввод подтвержден ({req.keystrokes} нажатий клавиш, 0 попыток Ctrl+V, "
+                f"вероятность ИИ: {ai_probability}%)."
+            )
+            authenticity = "High (Human Verified)"
+        elif score >= 50:
+            verdict = (
+                f"~ Частичная защита ({answered_count}/3 ответов за {time_spent} сек). "
+                f"Переключений окна: {req.tab_switches}, вероятность ИИ: {ai_probability}%."
+            )
+            authenticity = "Medium"
         else:
-            score = 25
-            verdict = "Подозрение на копипаст из ИИ. Кандидат не смог защитить логику своего кода."
-            authenticity = "Low"
+            verdict = (
+                f"🚨 Подозрение на генерацию ИИ (Вероятность ИИ: {ai_probability}%). "
+                f"Слабая защита или синтетические паттерны ввода."
+            )
+            authenticity = "Low (AI Suspected)"
 
-        breakdown = {
-            "code_quality": 95,
-            "blitz_defense": score,
-            "authenticity": authenticity
-        }
+    breakdown = {
+        "code_quality": 95 if score > 0 else 0,
+        "blitz_defense": score,
+        "authenticity": authenticity,
+        "ai_probability_percent": ai_probability,
+        "tab_switches": req.tab_switches,
+        "paste_attempts": req.paste_attempts
+    }
 
-    # Обновляем финальный балл кандидата в базе данных
+    # Сохраняем рассчитанный балл и вердикт в базу данных SQLite
     db.update_submission_score(req.submission_id, score, verdict)
 
     return {
+        "score": score,
+        "final_score": score,
         "ai_compliance_score": score,
         "verdict": verdict,
-        "breakdown": breakdown
+        "feedback": verdict,
+        "breakdown": breakdown,
+        "time_spent_sec": time_spent
     }
 
 
@@ -198,10 +301,8 @@ def verify_answers(req: VerifyAnswersRequest):
 def leaderboard():
     return db.get_leaderboard()
 
-# --- РАЗДАЧА ФРОНТЕНДА (СТАТИЧЕСКИХ ФАЙЛОВ) ---
-import os
-from fastapi.staticfiles import StaticFiles
 
+# --- РАЗДАЧА ФРОНТЕНДА (СТАТИЧЕСКИХ ФАЙЛОВ) ---
 # Проверяем, существует ли папка frontend, и монтируем её на маршрут /app
 if os.path.exists("frontend"):
     app.mount("/app", StaticFiles(directory="frontend", html=True), name="frontend")

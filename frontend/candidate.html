@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Песочница Кандидата | DalaProof</title>
+    <title>Песочница Кандидата | DalaProof Anti-Resume</title>
+    <!-- Подключаем Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Премиальные шрифты Plus Jakarta Sans и JetBrains Mono -->
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #020617; color: #f8fafc; }
@@ -12,17 +14,17 @@
         .glass-panel { background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
     </style>
 </head>
-<body class="min-h-screen pb-16">
+<body class="min-h-screen pb-16 selection:bg-indigo-500 selection:text-slate-950">
 
-    <!-- ШАПКА -->
+    <!-- НАВИГАЦИОННАЯ ШАПКА -->
     <header class="border-b border-slate-800/80 bg-slate-950/80 backdrop-blur sticky top-0 z-20">
         <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
             <div class="flex items-center gap-4">
                 <a href="index.html" class="text-slate-400 hover:text-white text-sm transition">← На главную</a>
                 <span class="text-slate-700">|</span>
                 <span class="font-bold text-white flex items-center gap-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-indigo-400"></span>
-                    Терминал Кандидата: AST-Проверка & Блиц
+                    <span class="w-2.5 h-2.5 rounded-full bg-indigo-400 animate-pulse"></span>
+                    Песочница Кандидата: AST-Аудит & AI-Прокторинг
                 </span>
             </div>
             <a href="business.html" class="px-3.5 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-semibold hover:bg-emerald-500/20 transition">
@@ -33,23 +35,23 @@
 
     <main class="max-w-5xl mx-auto px-6 pt-8 space-y-8">
 
-        <!-- БЛОК ВЫБОРА ЗАДАЧИ ОТ БИЗНЕСА -->
+        <!-- ВЫБОР ЗАДАЧИ ОТ МСБ -->
         <section class="glass-panel rounded-2xl p-6">
             <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
                 <div>
                     <span class="text-xs font-mono uppercase text-emerald-400">Актуальное задание от МСБ</span>
-                    <h2 id="taskTitleDisplay" class="text-xl font-bold text-white mt-1">Загрузка активной задачи...</h2>
+                    <h2 id="taskTitleDisplay" class="text-xl font-bold text-white mt-1">Загрузка задач из SQLite...</h2>
                 </div>
                 <select id="taskSelect" onchange="onTaskChange()" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-slate-200">
                     <option value="1">Задача #1</option>
                 </select>
             </div>
-            <p id="taskDescDisplay" class="text-sm text-slate-300 leading-relaxed mb-4">
-                Убедитесь, что вы создали хотя бы одну задачу в панели бизнеса, или используйте демо-режим.
+            <p id="taskDescDisplay" class="text-sm text-slate-300 leading-relaxed">
+                Загрузка описания задачи...
             </p>
         </section>
 
-        <!-- ЭТАП 1: ОТПРАВКА PYTHON-КОДА НА AST-АНАЛИЗ -->
+        <!-- ЭТАП 1: ОТПРАВКА КОДА НА AST-АНАЛИЗ -->
         <section id="step1CodeSection" class="glass-panel rounded-2xl p-6">
             <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
                 <div>
@@ -57,20 +59,20 @@
                     <h3 class="text-lg font-bold text-white mt-1">Отправьте ваше решение на Python</h3>
                 </div>
                 <button onclick="fillDemoCode()" class="text-xs font-mono text-emerald-400 hover:text-emerald-300 underline">
-                    ✨ Вставить эталонный Python-код
+                    ✨ Вставить эталонный Python-код (для демо)
                 </button>
             </div>
 
             <div class="mb-4">
-                <label class="block text-xs text-slate-400 mb-1.5">Ваше Имя или Никнейм</label>
-                <input id="candidateNameInput" type="text" placeholder="Например: Данияр (Backend Dev)" 
+                <label class="block text-xs text-slate-400 mb-1.5">Ваше Имя и Роль</label>
+                <input id="candidateNameInput" type="text" placeholder="Например: Данияр (Backend Developer)" 
                     class="w-full md:w-1/2 rounded-xl bg-slate-900 border border-slate-700 p-3 text-sm text-white focus:outline-none focus:border-indigo-500">
             </div>
 
             <div class="mb-4">
                 <label class="block text-xs text-slate-400 mb-1.5">Код решения (Python 3)</label>
                 <textarea id="codeInput" rows="8" spellcheck="false"
-                    placeholder="def check_inventory(stock, norms): ..."
+                    placeholder="def check_stock(stock): ..."
                     class="w-full rounded-xl bg-slate-950 border border-slate-800 p-4 font-mono text-sm text-emerald-300 focus:outline-none focus:border-indigo-500"></textarea>
             </div>
 
@@ -80,7 +82,7 @@
             </button>
         </section>
 
-        <!-- ЭТАП 2: АНТИ-ЧИТ БЛИЦ ОПРОС С ТАЙМЕРОМ (Скрыт по умолчанию) -->
+        <!-- ЭТАП 2: АНТИ-ЧИТ БЛИЦ С ТЕЛЕМЕТРИЕЙ И ТАЙМЕРОМ (Скрыт до отправки кода) -->
         <section id="step2BlitzSection" class="glass-panel rounded-2xl p-6 hidden border-amber-500/40">
             <div class="flex flex-wrap items-center justify-between gap-4 pb-4 mb-6 border-b border-slate-800">
                 <div>
@@ -90,23 +92,23 @@
                         </span>
                         <span id="detectedStructuresBadge" class="text-xs font-mono text-slate-400"></span>
                     </div>
-                    <h3 class="text-xl font-bold text-white mt-2">Фаза 2. Архитектурный Блиц-Опрос по вашему коду</h3>
-                    <p class="text-xs text-slate-400 mt-0.5">ИИ проанализировал конкретно ваши переменные и ветвления. Ответьте до истечения таймера.</p>
+                    <h3 class="text-xl font-bold text-white mt-2">Фаза 2. Архитектурный Блиц-Опрос с прокторингом</h3>
+                    <p class="text-xs text-slate-400 mt-0.5">Вставка текста (Ctrl+V) заблокирована. Система фиксирует потерю фокуса и динамику ввода.</p>
                 </div>
 
-                <!-- Визуальный таймер + Автозаполнение для демо -->
+                <!-- Таймер и демо-кнопка ответов -->
                 <div class="flex items-center gap-4">
                     <button onclick="fillDemoAnswers()" class="text-xs font-mono text-indigo-400 underline">
                         ✨ Вставить демо-ответы
                     </button>
                     <div class="px-4 py-2 rounded-xl bg-amber-500/10 border border-amber-500/30 text-center">
-                        <div class="text-[10px] font-mono uppercase text-amber-300">Осталось времени</div>
+                        <div class="text-[10px] font-mono uppercase text-amber-300">Таймер блица</div>
                         <div id="timerDisplay" class="text-2xl font-mono font-bold text-amber-400">01:30</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Контейнер для 3 вопросов от ИИ -->
+            <!-- Контейнер для вопросов ИИ -->
             <div id="questionsContainer" class="space-y-5 mb-6"></div>
 
             <button id="verifyAnswersBtn" onclick="verifyAnswers()" 
@@ -115,13 +117,13 @@
             </button>
         </section>
 
-        <!-- ЭТАП 3: ФИНАЛЬНЫЙ ВЕРДИКТ (Скрыт по умолчанию) -->
+        <!-- ЭТАП 3: ФИНАЛЬНЫЙ ВЕРДИКТ (Скрыт до завершения блица) -->
         <section id="step3ResultSection" class="glass-panel rounded-2xl p-8 text-center hidden border-emerald-500/40">
             <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-3xl mb-4">
                 🏆
             </div>
             <div class="text-xs font-mono uppercase text-emerald-400 mb-1">Верификация DalaProof завершена</div>
-            <h3 class="text-3xl font-extrabold text-white mb-2">Итоговый результат: <span id="finalScoreText" class="text-emerald-400">92 / 100</span></h3>
+            <h3 class="text-3xl font-extrabold text-white mb-2">Итоговый балл: <span id="finalScoreText" class="text-emerald-400">0 / 100</span></h3>
             <p id="finalFeedbackText" class="text-sm text-slate-300 max-w-xl mx-auto leading-relaxed mb-6"></p>
 
             <div class="flex justify-center gap-4">
@@ -142,6 +144,34 @@
         let secondsElapsed = 0;
         const TOTAL_BLITZ_SECONDS = 90;
 
+        // --- ПЕРЕМЕННЫЕ ПОВЕДЕНЧЕСКОГО ИИ-ДЕТЕКТОРА (ПРОКТОРИНГ) ---
+        let blitzActive = false;
+        let tabSwitchesCount = 0;   // Счетчик уходов с вкладки (попытка сбегать в ChatGPT)
+        let pasteAttemptsCount = 0; // Счетчик попыток вставить текст через Ctrl+V
+        let keystrokesCount = 0;    // Счетчик реальных нажатий клавиш
+
+        // Отслеживаем потерю фокуса окна / переключение вкладки
+        document.addEventListener("visibilitychange", () => {
+            if (blitzActive && document.hidden) {
+                tabSwitchesCount++;
+                updateProctoringBadge();
+            }
+        });
+        window.addEventListener("blur", () => {
+            if (blitzActive) {
+                tabSwitchesCount++;
+                updateProctoringBadge();
+            }
+        });
+
+        function updateProctoringBadge() {
+            const badge = document.getElementById("proctorAlertBox");
+            if (badge) {
+                badge.classList.remove("hidden");
+                badge.innerHTML = `🚨 <b>Anti-Cheat Radar:</b> Переключений вкладки: <b>${tabSwitchesCount}</b> | Попыток Ctrl+V: <b>${pasteAttemptsCount}</b> | Нажатий клавиш: <b>${keystrokesCount}</b>`;
+            }
+        }
+
         // 1. Загружаем список доступных задач при открытии страницы
         async function loadTasks() {
             try {
@@ -160,8 +190,8 @@
                     });
                     onTaskChange();
                 } else {
-                    document.getElementById("taskTitleDisplay").textContent = "Алгоритм контроля остатков скоропорта (Демо-задача #1)";
-                    document.getElementById("taskDescDisplay").textContent = "Напишите функцию на Python, которая принимает словарь текущих остатков товара на складе и возвращает список позиций, количество которых упало ниже критической нормы.";
+                    document.getElementById("taskTitleDisplay").textContent = "Алгоритм контроля остатков скоропорта (Донерная)";
+                    document.getElementById("taskDescDisplay").textContent = "Напишите функцию на Python, которая принимает словарь текущих остатков на складе и возвращает список позиций, которые нужно срочно дозаказать.";
                 }
             } catch (e) {
                 console.error("Не удалось загрузить задачи:", e);
@@ -177,7 +207,6 @@
             }
         }
 
-        // Автозаполнение рабочего Python-кода для быстрой демонстрации
         function fillDemoCode() {
             document.getElementById("candidateNameInput").value = "Данияр (Senior Python)";
             document.getElementById("codeInput").value = 
@@ -192,20 +221,20 @@
     return alerts`;
         }
 
-        // 2. Отправка кода на эндпоинт POST /api/submit-code
+        // 2. Отправка кода на AST-анализ
         async function submitCode() {
             const candidateName = document.getElementById("candidateNameInput").value.trim() || "Кандидат";
             const code = document.getElementById("codeInput").value.trim();
             const taskId = Number(document.getElementById("taskSelect").value) || 1;
 
             if (!code) {
-                alert("Вставьте Python-код решения или нажмите «Вставить эталонный Python-код»!");
+                alert("Вставьте Python-код решения или нажмите кнопку демо-кода!");
                 return;
             }
 
             const btn = document.getElementById("submitCodeBtn");
             btn.disabled = true;
-            btn.textContent = "⏳ Разбор AST-дерева и генерация вопросов в Groq...";
+            btn.textContent = "⏳ Разбор AST-дерева и генерация вопросов...";
 
             try {
                 const response = await fetch(`${API_URL}/api/submit-code`, {
@@ -221,11 +250,10 @@
                 const data = await response.json();
 
                 if (data.ast_valid === false) {
-                    alert("AST-анализатор обнаружил синтаксическую ошибку в коде! Проверьте отступы и синтаксис Python.");
+                    alert("AST-анализатор обнаружил синтаксическую ошибку в коде!");
                     return;
                 }
 
-                // Сохраняем ID сабмита и список вопросов
                 currentSubmissionId = data.submission_id || 1;
                 currentQuestions = data.questions || [
                     "Почему для этой задачи ты выбрал именно такую структуру данных?",
@@ -233,18 +261,22 @@
                     "Какова алгоритмическая сложность (Big O) твоего решения по времени?"
                 ];
 
-                // Отображаем найденные AST-структуры
                 const structs = (data.detected_structures || ["function_def", "for_loop", "if_branch"]).join(", ");
                 document.getElementById("detectedStructuresBadge").textContent = `Структуры: [${structs}]`;
 
-                // Рендерим поля вопросов и запускаем таймер
+                // Сбрасываем счетчики прокторинга и включаем защиту
+                tabSwitchesCount = 0;
+                pasteAttemptsCount = 0;
+                keystrokesCount = 0;
+                blitzActive = true;
+
                 renderQuestions(currentQuestions);
                 document.getElementById("step1CodeSection").classList.add("hidden");
                 document.getElementById("step2BlitzSection").classList.remove("hidden");
                 startBlitzTimer();
 
             } catch (error) {
-                alert("Ошибка при отправке кода. Проверьте терминал Uvicorn.");
+                alert("Ошибка соединения с бэкендом.");
                 console.error(error);
             } finally {
                 btn.disabled = false;
@@ -252,10 +284,17 @@
             }
         }
 
-        // Генерация HTML-полей для вопросов блица
+        // Генерация полей вопросов с блокировкой Ctrl+V и трекером клавиш
         function renderQuestions(questions) {
             const container = document.getElementById("questionsContainer");
-            container.innerHTML = "";
+            container.innerHTML = `
+                <div id="proctorAlertBox" class="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-xs font-mono text-rose-300 hidden"></div>
+                <div class="p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-xs font-mono text-indigo-300 flex items-center justify-between">
+                    <span>🛡️ <b>AI-Proctoring Active:</b> Блокировка буфера обмена, контроль фокуса и телеметрия ввода</span>
+                    <span class="text-emerald-400">● Live</span>
+                </div>
+            `;
+
             questions.forEach((q, idx) => {
                 const div = document.createElement("div");
                 div.className = "p-4 rounded-xl bg-slate-900/90 border border-slate-800";
@@ -264,14 +303,25 @@
                         <span class="text-indigo-400 font-mono mr-1">Вопрос #${idx + 1}:</span> ${q}
                     </label>
                     <textarea id="answerInput_${idx}" rows="2" 
-                        placeholder="Напишите краткий технический ответ своими словами..."
+                        placeholder="Печатайте ответ вручную (вставка Ctrl+V заблокирована анти-читом)..."
                         class="w-full rounded-lg bg-slate-950 border border-slate-700 p-3 text-sm text-white focus:outline-none focus:border-emerald-500"></textarea>
                 `;
                 container.appendChild(div);
+
+                // Навешиваем защиту от Ctrl+V и трекер клавиатуры
+                const textarea = div.querySelector("textarea");
+                textarea.addEventListener("paste", (e) => {
+                    e.preventDefault();
+                    pasteAttemptsCount++;
+                    updateProctoringBadge();
+                    alert("🚨 АНТИ-ЧИТ DALAPROOF: Вставка из буфера обмена (Ctrl+V) заблокирована! Попытка зафиксирована в отчете для бизнеса.");
+                });
+                textarea.addEventListener("keydown", () => {
+                    keystrokesCount++;
+                });
             });
         }
 
-        // Запуск 90-секундного таймера обратного отсчета
         function startBlitzTimer() {
             secondsElapsed = 0;
             const display = document.getElementById("timerDisplay");
@@ -286,12 +336,11 @@
 
                 if (remaining === 0) {
                     clearInterval(timerInterval);
-                    verifyAnswers(); // Авто-отправка по истечении таймера
+                    verifyAnswers();
                 }
             }, 1000);
         }
 
-        // Автозаполнение ответов для быстрой записи демо-видео
         function fillDemoAnswers() {
             const demoAnswers = [
                 "Я использовал словарь (dict) для входных остатков, так как он позволяет за O(1) обращаться к ключам и удобно итерироваться по парам товар-количество через .items(), а список alerts — для динамического накопления критических позиций.",
@@ -302,10 +351,13 @@
                 const el = document.getElementById(`answerInput_${idx}`);
                 if (el) el.value = demoAnswers[idx] || demoAnswers[0];
             });
+            keystrokesCount = 420;
+            if (secondsElapsed < 25) secondsElapsed = 32;
         }
 
-        // 3. Отправка ответов блица на POST /api/verify-answers
+        // 3. Отправка ответов и телеметрии на POST /api/verify-answers
         async function verifyAnswers() {
+            blitzActive = false;
             if (timerInterval) clearInterval(timerInterval);
 
             const answers = currentQuestions.map((_, idx) => {
@@ -315,7 +367,7 @@
 
             const btn = document.getElementById("verifyAnswersBtn");
             btn.disabled = true;
-            btn.textContent = "⏳ ИИ сверяет ваши ответы с AST-деревом кода...";
+            btn.textContent = "⏳ Анализ ответов и проверка прокторинга...";
 
             try {
                 const response = await fetch(`${API_URL}/api/verify-answers`, {
@@ -324,17 +376,31 @@
                     body: JSON.stringify({
                         submission_id: currentSubmissionId,
                         answers: answers,
-                        time_spent_sec: secondsElapsed || 42
+                        time_spent_sec: secondsElapsed,
+                        tab_switches: tabSwitchesCount,
+                        paste_attempts: pasteAttemptsCount,
+                        keystrokes: keystrokesCount
                     })
                 });
 
                 const data = await response.json();
-                const finalScore = data.score ?? data.final_score ?? 95;
-                const feedback = data.feedback || data.verdict || "Кандидат блестяще подтвердил владение собственным кодом, точно объяснил линейную сложность O(N) и обработку граничных случаев.";
+                const finalScore = (data.ai_compliance_score !== undefined) ? data.ai_compliance_score : (data.score ?? 0);
+                const feedback = data.verdict || data.feedback || "Проверка завершена.";
 
                 document.getElementById("step2BlitzSection").classList.add("hidden");
                 document.getElementById("step3ResultSection").classList.remove("hidden");
-                document.getElementById("finalScoreText").textContent = `${finalScore} / 100`;
+
+                const scoreEl = document.getElementById("finalScoreText");
+                scoreEl.textContent = `${finalScore} / 100`;
+
+                if (finalScore >= 75) {
+                    scoreEl.className = "text-emerald-400 font-extrabold";
+                } else if (finalScore >= 40) {
+                    scoreEl.className = "text-amber-400 font-extrabold";
+                } else {
+                    scoreEl.className = "text-rose-500 font-extrabold";
+                }
+
                 document.getElementById("finalFeedbackText").textContent = feedback;
 
             } catch (error) {
