@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ru" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DalaProof — Anti-Resume Technical Validation Platform</title>
+    <!-- Подключаем Tailwind CSS для современной верстки -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Подключаем премиальные шрифты: Plus Jakarta Sans (текст) и JetBrains Mono (код) -->
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Настройка шрифтов и плавных анимаций */
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #020617; color: #f8fafc; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .glass-card { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .glass-card:hover { border-color: rgba(16, 185, 129, 0.4); transform: translateY(-4px); transition: all 0.3s ease; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between relative overflow-x-hidden selection:bg-emerald-500 selection:text-slate-950">
+
+    <!-- Фоновое неоновое свечение для глубины интерфейса -->
+    <div class="fixed top-[-10%] left-[20%] w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-[130px] pointer-events-none"></div>
+    <div class="fixed bottom-[-10%] right-[20%] w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[130px] pointer-events-none"></div>
+
+    <!-- ВЕРХНЯЯ НАВИГАЦИОННАЯ ПАНЕЛЬ -->
+    <header class="w-full max-w-6xl mx-auto px-6 py-6 flex items-center justify-between z-10">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center font-mono font-bold text-slate-950 text-xl shadow-lg shadow-emerald-500/20">
+                DP
+            </div>
+            <div>
+                <span class="font-extrabold text-xl tracking-tight text-white">DalaProof</span>
+                <span class="ml-2 text-xs font-mono uppercase px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Anti-Resume v1.0</span>
+            </div>
+        </div>
+        <!-- Живой индикатор статуса сервера FastAPI -->
+        <div class="flex items-center gap-4">
+            <a href="/docs" target="_blank" class="text-xs font-mono text-slate-400 hover:text-white transition">Swagger API ↗</a>
+            <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900 border border-slate-800 text-xs font-medium text-slate-300">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>AST + Groq Llama-3.3 Online</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- ГЛАВНЫЙ ЭКРАН (HERO SECTION) -->
+    <main class="max-w-6xl mx-auto px-6 py-12 flex-1 flex flex-col justify-center z-10 animate-fade-in">
+        <div class="text-center max-w-3xl mx-auto mb-14">
+            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-semibold mb-6">
+                <span>⚡ Конец эпохи бумажных резюме и сгенерированного кода</span>
+            </div>
+            <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight leading-tight mb-6 bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
+                Проверяем реальный код,<br>а не сказки в резюме.
+            </h1>
+            <p class="text-slate-400 text-lg leading-relaxed">
+                Платформа технической верификации разработчиков под реальные операционные задачи МСБ. Статический разбор синтаксического дерева (<span class="text-emerald-400 font-mono">Python AST</span>) в связке с анти-чит блиц-интервью на базе <span class="text-indigo-400 font-mono">Groq LLM</span>.
+            </p>
+        </div>
+
+        <!-- КАРТОЧКИ ВЫБОРА РОЛИ (БИЗНЕС ИЛИ КАНДИДАТ) -->
+        <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto w-full">
+            
+            <!-- Карточка 1: Кабинет Предпринимателя (МСБ) -->
+            <a href="business.html" class="glass-card rounded-2xl p-8 flex flex-col justify-between group cursor-pointer">
+                <div>
+                    <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition">
+                        🏢
+                    </div>
+                    <div class="text-xs font-mono uppercase tracking-wider text-emerald-400 mb-2">Для сектора МСБ и HR</div>
+                    <h2 class="text-2xl font-bold text-white mb-3">Терминал Заказчика</h2>
+                    <p class="text-slate-400 text-sm leading-relaxed mb-6">
+                        Опишите операционную боль вашего бизнеса простыми словами. ИИ автоматически скомпилирует алгоритмическую задачу, а дашборд покажет верифицированный рейтинг кандидатов с защитой от списывания.
+                    </p>
+                </div>
+                <div class="flex items-center justify-between pt-4 border-t border-slate-800/80 text-sm font-semibold text-emerald-400 group-hover:translate-x-1 transition">
+                    <span>Перейти в панель бизнеса</span>
+                    <span>→</span>
+                </div>
+            </a>
+
+            <!-- Карточка 2: Терминал Разработчика (Кандидат) -->
+            <a href="candidate.html" class="glass-card rounded-2xl p-8 flex flex-col justify-between group cursor-pointer">
+                <div>
+                    <div class="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition">
+                        💻
+                    </div>
+                    <div class="text-xs font-mono uppercase tracking-wider text-indigo-400 mb-2">Для инженеров и студентов</div>
+                    <h2 class="text-2xl font-bold text-white mb-3">Песочница Кандидата</h2>
+                    <p class="text-slate-400 text-sm leading-relaxed mb-6">
+                        Никаких скучных анкет. Выберите реальную задачу от локального бизнеса, напишите чистый Python-код, пройдите мгновенный AST-аудит и защитите свое решение в 90-секундном архитектурном блице.
+                    </p>
+                </div>
+                <div class="flex items-center justify-between pt-4 border-t border-slate-800/80 text-sm font-semibold text-indigo-400 group-hover:translate-x-1 transition">
+                    <span>Открыть терминал кода</span>
+                    <span>→</span>
+                </div>
+            </a>
+
+        </div>
+
+        <!-- НИЖНЯЯ ПАНЕЛЬ АРХИТЕКТУРЫ (ПЛЮШКА ДЛЯ ЖЮРИ) -->
+        <div class="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto w-full text-center">
+            <div class="p-4 rounded-xl bg-slate-900/50 border border-slate-800/80">
+                <div class="text-emerald-400 font-mono font-bold text-lg">ast.NodeVisitor</div>
+                <div class="text-xs text-slate-400 mt-1">Анализ цикломатической сложности</div>
+            </div>
+            <div class="p-4 rounded-xl bg-slate-900/50 border border-slate-800/80">
+                <div class="text-indigo-400 font-mono font-bold text-lg">Llama-3.3-70B</div>
+                <div class="text-xs text-slate-400 mt-1">Генерация вопросов по коду</div>
+            </div>
+            <div class="p-4 rounded-xl bg-slate-900/50 border border-slate-800/80">
+                <div class="text-amber-400 font-mono font-bold text-lg">90s Anti-Cheat</div>
+                <div class="text-xs text-slate-400 mt-1">Контроль времени и защита от Copy-Paste</div>
+            </div>
+            <div class="p-4 rounded-xl bg-slate-900/50 border border-slate-800/80">
+                <div class="text-teal-400 font-mono font-bold text-lg">FastAPI + SQLite</div>
+                <div class="text-xs text-slate-400 mt-1">Асинхронное ядро и хранение метрик</div>
+            </div>
+        </div>
+    </main>
+
+    <!-- ПОДВАЛ -->
+    <footer class="w-full max-w-6xl mx-auto px-6 py-6 border-t border-slate-900 text-center text-xs text-slate-500 flex justify-between items-center z-10">
+        <span>DalaProof (Anti-Resume) — Hackathon MVP</span>
+        <span class="font-mono">Powered by Python AST & Groq API</span>
+    </footer>
+
+</body>
+</html>

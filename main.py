@@ -198,5 +198,10 @@ def verify_answers(req: VerifyAnswersRequest):
 def leaderboard():
     return db.get_leaderboard()
 
+# --- РАЗДАЧА ФРОНТЕНДА (СТАТИЧЕСКИХ ФАЙЛОВ) ---
+import os
 from fastapi.staticfiles import StaticFiles
-app.mount("/app", StaticFiles(directory="frontend", html=True), name="frontend")
+
+# Проверяем, существует ли папка frontend, и монтируем её на маршрут /app
+if os.path.exists("frontend"):
+    app.mount("/app", StaticFiles(directory="frontend", html=True), name="frontend")

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ru" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кабинет Бизнеса | DalaProof</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #020617; color: #f8fafc; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        .glass-panel { background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
+    </style>
+</head>
+<body class="min-h-screen pb-16">
+
+    <!-- НАВИГАЦИЯ -->
+    <header class="border-b border-slate-800/80 bg-slate-950/80 backdrop-blur sticky top-0 z-20">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <a href="index.html" class="text-slate-400 hover:text-white text-sm flex items-center gap-2 transition">
+                    <span>← На главную</span>
+                </a>
+                <span class="text-slate-700">|</span>
+                <span class="font-bold text-white flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+                    Терминал МСБ: Генерация задач и Лидерборд
+                </span>
+            </div>
+            <a href="candidate.html" class="px-3.5 py-1.5 rounded-lg bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-xs font-semibold hover:bg-indigo-500/20 transition">
+                Перейти в режим Кандидата →
+            </a>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-6 pt-8 grid lg:grid-cols-12 gap-8">
+        
+        <!-- ЛЕВАЯ КОЛОНКА: ГЕНЕРАТОР ЗАДАЧ ИЗ БОЛИ БИЗНЕСА (5 колонок) -->
+        <section class="lg:col-span-5 flex flex-col gap-6">
+            <div class="glass-panel rounded-2xl p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-xs font-mono uppercase tracking-wider text-emerald-400">Шаг 1. AI-Транслятор</span>
+                    <!-- Кнопка мгновенной вставки демо-текста для экономии времени на защите -->
+                    <button onclick="fillDemoPain()" class="text-xs font-mono text-indigo-400 hover:text-indigo-300 underline">
+                        ✨ Вставить демо-кейс МСБ
+                    </button>
+                </div>
+                <h2 class="text-xl font-bold text-white mb-2">Опишите проблему вашего бизнеса</h2>
+                <p class="text-xs text-slate-400 mb-4 leading-relaxed">
+                    Не нужно писать ТЗ. Опишите, где ваш магазин, склад или сервис теряет деньги, и Llama-3.3 превратит это в строгую алгоритмическую задачу.
+                </p>
+
+                <!-- Поле ввода бизнес-боли -->
+                <textarea id="businessPainInput" rows="4" 
+                    placeholder="Например: У нас сеть минимаркетов в Шымкенте, кассиры путаются в остатках скоропорта..."
+                    class="w-full rounded-xl bg-slate-900/90 border border-slate-700/80 p-3.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition mb-4"></textarea>
+
+                <button id="generateBtn" onclick="generateTask()" 
+                    class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-slate-950 font-bold text-sm hover:opacity-95 transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20">
+                    <span>⚡ Сгенерировать техническую задачу</span>
+                </button>
+            </div>
+
+            <!-- БЛОК РЕЗУЛЬТАТА: ПОСЛЕДНЯЯ СГЕНЕРИРОВАННАЯ ЗАДАЧА -->
+            <div id="generatedTaskCard" class="glass-panel rounded-2xl p-6 hidden border-emerald-500/30">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-mono px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                        Задача сохранена в SQLite
+                    </span>
+                    <span id="resTaskId" class="text-xs font-mono text-slate-400">ID: #1</span>
+                </div>
+                <h3 id="resTaskTitle" class="text-lg font-bold text-white mt-2 mb-2"></h3>
+                <p id="resTaskDesc" class="text-xs text-slate-300 leading-relaxed mb-4"></p>
+                
+                <div class="bg-slate-950 rounded-xl p-3 border border-slate-800 font-mono text-xs space-y-1.5">
+                    <div class="text-slate-400">Входные данные (Input): <span id="resTaskInput" class="text-emerald-400"></span></div>
+                    <div class="text-slate-400">Ожидаемый ответ (Output): <span id="resTaskOutput" class="text-indigo-400"></span></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ПРАВАЯ КОЛОНКА: ТАБЛИЦА ЛИДЕРОВ И РЕЙТИНГ КАНДИДАТОВ (7 колонок) -->
+        <section class="lg:col-span-7 flex flex-col gap-6">
+            <div class="glass-panel rounded-2xl p-6 flex-1">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <span class="text-xs font-mono uppercase tracking-wider text-indigo-400">Шаг 2. Верифицированный найм</span>
+                        <h2 class="text-xl font-bold text-white mt-1">Рейтинг кандидатов (Anti-Resume Leaderboard)</h2>
+                    </div>
+                    <button onclick="loadLeaderboard()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-mono text-slate-200 transition flex items-center gap-1.5">
+                        <span>🔄 Обновить</span>
+                    </button>
+                </div>
+
+                <!-- Таблица результатов -->
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-slate-800 text-[11px] font-mono uppercase text-slate-400">
+                                <th class="py-3 px-3">ID</th>
+                                <th class="py-3 px-3">Кандидат</th>
+                                <th class="py-3 px-3">AST-Аудит</th>
+                                <th class="py-3 px-3">Балл ИИ</th>
+                                <th class="py-3 px-3">Вердикт системы</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboardBody" class="divide-y divide-slate-800/60 text-sm">
+                            <!-- Строки подгружаются динамически через JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Пустое состояние, если кандидатов пока нет -->
+                <div id="emptyLeaderboard" class="text-center py-12 text-slate-500 text-sm hidden">
+                    Пока нет проверенных решений. Отправьте код во вкладке «Кандидат»!
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Базовый URL вашего локального сервера FastAPI
+        const API_URL = "http://127.0.0.1:8000";
+
+        // Функция для автозаполнения демо-текста (чтобы не печатать вручную на видео)
+        function fillDemoPain() {
+            document.getElementById("businessPainInput").value = 
+                "У нас сеть магазинов у дома в Шымкенте, постоянно путаются остатки скоропортящихся товаров и кассиры делают скидки вручную, из-за чего идет минус по кассе. Нужна функция выявления критических остатков.";
+        }
+
+        // 1. Функция отправки бизнес-боли на эндпоинт POST /api/generate-task
+        async function generateTask() {
+            const painText = document.getElementById("businessPainInput").value.trim();
+            if (!painText) {
+                alert("Пожалуйста, введите описание проблемы бизнеса или нажмите кнопку демо-кейса!");
+                return;
+            }
+
+            const btn = document.getElementById("generateBtn");
+            btn.disabled = true;
+            btn.innerHTML = `<span class="animate-spin">⏳</span> Генерация через Groq LLM...`;
+
+            try {
+                const response = await fetch(`${API_URL}/api/generate-task`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ business_pain: painText })
+                });
+
+                const data = await response.json();
+
+                // Отображаем карточку созданной задачи
+                document.getElementById("generatedTaskCard").classList.remove("hidden");
+                document.getElementById("resTaskId").textContent = `Task ID: #${data.task_id || 1}`;
+                document.getElementById("resTaskTitle").textContent = data.title || "Алгоритмическая задача МСБ";
+                document.getElementById("resTaskDesc").textContent = data.description || painText;
+                document.getElementById("resTaskInput").textContent = JSON.stringify(data.input_example);
+                document.getElementById("resTaskOutput").textContent = JSON.stringify(data.expected_output);
+
+            } catch (error) {
+                alert("Ошибка соединения с сервером FastAPI. Убедитесь, что uvicorn запущен на порту 8000.");
+                console.error(error);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<span>⚡ Сгенерировать техническую задачу</span>`;
+            }
+        }
+
+        // 2. Функция загрузки таблицы лидеров с эндпоинта GET /api/leaderboard
+        async function loadLeaderboard() {
+            const tbody = document.getElementById("leaderboardBody");
+            const emptyBox = document.getElementById("emptyLeaderboard");
+            tbody.innerHTML = "";
+
+            try {
+                const response = await fetch(`${API_URL}/api/leaderboard`);
+                const data = await response.json();
+                // Поддерживаем как массив напрямую, так и обёртку { leaderboard: [...] }
+                const list = Array.isArray(data) ? data : (data.leaderboard || []);
+
+                if (list.length === 0) {
+                    emptyBox.classList.remove("hidden");
+                    return;
+                }
+                emptyBox.classList.add("hidden");
+
+                list.forEach((item, idx) => {
+                    const score = item.score ?? item.final_score ?? 0;
+                    const astValid = item.ast_valid !== false;
+
+                    // Определяем цвет бейджа в зависимости от балла
+                    let badgeHtml = `<span class="px-2.5 py-1 rounded-full text-xs font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">✓ Подтвержден</span>`;
+                    if (score < 50) {
+                        badgeHtml = `<span class="px-2.5 py-1 rounded-full text-xs font-mono bg-rose-500/10 text-rose-400 border border-rose-500/20">✕ Подозрение на AI-чит</span>`;
+                    } else if (score < 75) {
+                        badgeHtml = `<span class="px-2.5 py-1 rounded-full text-xs font-mono bg-amber-500/10 text-amber-400 border border-amber-500/20">~ Требует ревью</span>`;
+                    }
+
+                    const tr = document.createElement("tr");
+                    tr.className = "hover:bg-slate-900/50 transition";
+                    tr.innerHTML = `
+                        <td class="py-3.5 px-3 font-mono text-xs text-slate-400">#${item.id || item.submission_id || (idx + 1)}</td>
+                        <td class="py-3.5 px-3 font-semibold text-white">${item.candidate_name || "Кандидат"}</td>
+                        <td class="py-3.5 px-3 font-mono text-xs ${astValid ? 'text-emerald-400' : 'text-rose-400'}">
+                            ${astValid ? 'AST Valid' : 'Syntax Err'}
+                        </td>
+                        <td class="py-3.5 px-3 font-mono font-bold text-white">${score} / 100</td>
+                        <td class="py-3.5 px-3">${badgeHtml}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (err) {
+                console.error("Ошибка загрузки лидерборда:", err);
+            }
+        }
+
+        // Автоматически загружаем лидерборд при открытии страницы
+        window.addEventListener("DOMContentLoaded", loadLeaderboard);
+    </script>
+</body>
+</html>
