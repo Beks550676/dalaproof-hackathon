@@ -72,14 +72,16 @@ class CodeVisitor(ast.NodeVisitor):
                 exceptions_raised.append("Exception raised")
 
         class FunctionFact:
-            name = func_name
-            qualname = qualname
-            complexity = complexity
-            branches = branches
-            exceptions_raised = exceptions_raised
-            is_stub = len(node.body) == 1 and isinstance(node.body[0], ast.Pass)
-            is_trivial = len(node.body) == 1 and isinstance(node.body[0], ast.Return)
-            is_method = self._current_class is not None
+            pass
+            
+        FunctionFact.name = func_name
+        FunctionFact.qualname = func_name
+        FunctionFact.complexity = complexity
+        FunctionFact.branches = branches
+        FunctionFact.exceptions_raised = exceptions_raised
+        FunctionFact.is_stub = len(node.body) == 1 and isinstance(node.body[0], ast.Pass)
+        FunctionFact.is_trivial = len(node.body) == 1 and isinstance(node.body[0], ast.Return)
+        FunctionFact.is_method = self._current_class is not None
 
         self.functions.append(FunctionFact())
         self.generic_visit(node)
